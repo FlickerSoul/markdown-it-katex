@@ -26,8 +26,8 @@
     },
     "license": "MIT",
     "dependencies": {
-        "katex": "^0.16.4",
-        "@types/katex": "^0.16.0"
+        "@types/katex": "^0.16.0",
+        "katex": "^0.16.4"
     },
     "devDependencies": {
         "@types/markdown-it": "^12.2.3",

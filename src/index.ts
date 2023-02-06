@@ -1,8 +1,8 @@
 import katex from 'katex'
-import type * as StateBlock from 'markdown-it/lib/rules_block/state_block'
+import type StateBlock from 'markdown-it/lib/rules_block/state_block'
 import type StateCore from 'markdown-it/lib/rules_core/state_core'
-import type * as StateInline from 'markdown-it/lib/rules_inline/state_inline'
-import type * as Token from 'markdown-it/lib/token'
+import type StateInline from 'markdown-it/lib/rules_inline/state_inline'
+import type Token from 'markdown-it/lib/token'
 
 /**
  * Test if potential opening or closing delimiter

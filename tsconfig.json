@@ -5,6 +5,7 @@
         "strict": true,
         "declaration": true,
         "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true,
         "rootDir": "src",
         "outDir": "dist"
     },
