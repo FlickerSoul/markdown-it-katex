@@ -3,6 +3,7 @@ import type StateBlock from 'markdown-it/lib/rules_block/state_block'
 import type StateCore from 'markdown-it/lib/rules_core/state_core'
 import type StateInline from 'markdown-it/lib/rules_inline/state_inline'
 import type Token from 'markdown-it/lib/token'
+import MarkdownIt from "markdown-it";
 
 /**
  * Test if potential opening or closing delimiter
@@ -447,7 +448,7 @@ function escapeHtml(unsafe: string): string {
       .replace(/'/g, '&#039;')
 }
 
-export = function (md: import('markdown-it'), options: any) {
+export = function (md: MarkdownIt, options: any) {
     // Default options
 
     options = options || {}
