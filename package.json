@@ -4,7 +4,8 @@
     "description": "Markdown-it plugin that provides VS Code's KaTeX support",
     "main": "build/index.js",
     "files": [
-        "build/index.js"
+        "build/index.js",
+        "build/index.d.ts"
     ],
     "scripts": {
         "compile": "tsc -p .",

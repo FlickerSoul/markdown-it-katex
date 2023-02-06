@@ -166,8 +166,5 @@ typings/
 # next.js build output
 .next
 
-# build output
-dist
-
 # jetbrains
 .idea
