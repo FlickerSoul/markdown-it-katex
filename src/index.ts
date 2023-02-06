@@ -447,7 +447,7 @@ function escapeHtml(unsafe: string): string {
       .replace(/'/g, '&#039;')
 }
 
-module.exports = function (md: import('markdown-it'), options: any) {
+export = function (md: import('markdown-it'), options: any) {
     // Default options
 
     options = options || {}
@@ -494,7 +494,7 @@ module.exports = function (md: import('markdown-it'), options: any) {
     if (enableBareBlocks)
         md.inline.ruler.before('text', 'math_inline_bare_block', inlineBareBlock)
 
-    md.block.ruler.after('blockquote', 'math_block', (state, start, end, silent) => {
+    md.block.ruler.after('blockquote', 'math_block', (state: StateBlock, start: number, end: number, silent: boolean) => {
         if (enableBareBlocks && blockBareMath(state, start, end, silent))
             return true
 
@@ -510,13 +510,13 @@ module.exports = function (md: import('markdown-it'), options: any) {
     const math_inline_within_html_regex = /(?<html_before_math>[\s\S]*?)\$(?<math>.*?)\$(?<html_after_math>(?:(?!\$.*?\$)[\s\S])*)/gm
 
     if (enableMathBlockInHtml) {
-        md.core.ruler.push('math_block_in_html_block', (state) => {
+        md.core.ruler.push('math_block_in_html_block', (state: StateCore) => {
             return handleMathInHtml(state, 'math_block', '$$', math_block_within_html_regex)
         })
     }
 
     if (enableMathInlineInHtml) {
-        md.core.ruler.push('math_inline_in_html_block', (state) => {
+        md.core.ruler.push('math_inline_in_html_block', (state: StateCore) => {
             return handleMathInHtml(state, 'math_inline', '$', math_inline_within_html_regex)
         })
     }
