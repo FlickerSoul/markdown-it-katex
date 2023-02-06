@@ -8,17 +8,14 @@ function isValidInlineDelim(state, pos) {
     const prevChar = state.src[pos - 1];
     const char = state.src[pos];
     const nextChar = state.src[pos + 1];
-    if (char !== '$') {
+    if (char !== '$')
         return { can_open: false, can_close: false };
-    }
     let canOpen = false;
     let canClose = false;
-    if (prevChar !== '$' && prevChar !== '\\' && (prevChar === undefined || isWhitespace(prevChar) || !isWordCharacterOrNumber(prevChar))) {
+    if (prevChar !== '$' && prevChar !== '\\' && (prevChar === undefined || isWhitespace(prevChar) || !isWordCharacterOrNumber(prevChar)))
         canOpen = true;
-    }
-    if (nextChar !== '$' && (nextChar == undefined || isWhitespace(nextChar) || !isWordCharacterOrNumber(nextChar))) {
+    if (nextChar !== '$' && (nextChar === undefined || isWhitespace(nextChar) || !isWordCharacterOrNumber(nextChar)))
         canClose = true;
-    }
     return { can_open: canOpen, can_close: canClose };
 }
 function isWhitespace(char) {
@@ -35,27 +32,23 @@ function isValidBlockDelim(state, pos) {
     if (char === '$'
         && prevChar !== '$' && prevChar !== '\\'
         && nextChar === '$'
-        && nextCharPlus1 !== '$') {
+        && nextCharPlus1 !== '$')
         return { can_open: true, can_close: true };
-    }
     return { can_open: false, can_close: false };
 }
 function inlineMath(state, silent) {
-    if (state.src[state.pos] !== "$") {
+    if (state.src[state.pos] !== '$')
         return false;
-    }
     const lastToken = state.tokens.at(-1);
     if (lastToken?.type === 'html_inline') {
         // We may be inside of inside of inline html
-        if (/^<\w+.+[^/]>$/.test(lastToken.content)) {
+        if (/^<\w+.+[^/]>$/.test(lastToken.content))
             return false;
-        }
     }
     let res = isValidInlineDelim(state, state.pos);
     if (!res.can_open) {
-        if (!silent) {
-            state.pending += "$";
-        }
+        if (!silent)
+            state.pending += '$';
         state.pos += 1;
         return true;
     }
@@ -63,68 +56,66 @@ function inlineMath(state, silent) {
     // This loop will assume that the first leading backtick can not
     // be the first character in state.src, which is known since
     // we have found an opening delimieter already.
-    let start = state.pos + 1;
+    const start = state.pos + 1;
     let match = start;
     let pos;
-    while ((match = state.src.indexOf("$", match)) !== -1) {
+    // eslint-disable-next-line no-cond-assign
+    while ((match = state.src.indexOf('$', match)) !== -1) {
         // Found potential $, look for escapes, pos will point to
         // first non escape when complete
         pos = match - 1;
-        while (state.src[pos] === "\\") {
+        while (state.src[pos] === '\\')
             pos -= 1;
-        }
         // Even number of escapes, potential closing delimiter found
-        if (((match - pos) % 2) == 1) {
+        if (((match - pos) % 2) === 1)
             break;
-        }
         match += 1;
     }
     // No closing delimter found.  Consume $ and continue.
     if (match === -1) {
-        if (!silent) {
-            state.pending += "$";
-        }
+        if (!silent)
+            state.pending += '$';
         state.pos = start;
         return true;
     }
     // Check if we have empty content, ie: $$.  Do not parse.
     if (match - start === 0) {
-        if (!silent) {
-            state.pending += "$$";
-        }
+        if (!silent)
+            state.pending += '$$';
         state.pos = start + 1;
         return true;
     }
     // Check for valid closing delimiter
     res = isValidInlineDelim(state, match);
     if (!res.can_close) {
-        if (!silent) {
-            state.pending += "$";
-        }
+        if (!silent)
+            state.pending += '$';
         state.pos = start;
         return true;
     }
     if (!silent) {
         const token = state.push('math_inline', 'math', 0);
-        token.markup = "$";
+        token.markup = '$';
         token.content = state.src.slice(start, match);
     }
     state.pos = match + 1;
     return true;
 }
 function blockMath(state, start, end, silent) {
-    var lastLine, next, lastPos, found = false, token, pos = state.bMarks[start] + state.tShift[start], max = state.eMarks[start];
-    if (pos + 2 > max) {
+    let lastLine;
+    let next;
+    let lastPos;
+    let found = false;
+    let pos = state.bMarks[start] + state.tShift[start];
+    let max = state.eMarks[start];
+    if (pos + 2 > max)
         return false;
-    }
-    if (state.src.slice(pos, pos + 2) !== '$$') {
+    if (state.src.slice(pos, pos + 2) !== '$$')
         return false;
-    }
     pos += 2;
     let firstLine = state.src.slice(pos, max);
-    if (silent) {
+    if (silent)
         return true;
-    }
     if (firstLine.trim().slice(-2) === '$$') {
         // Single line expression
         firstLine = firstLine.trim().slice(0, -2);
@@ -132,9 +123,8 @@ function blockMath(state, start, end, silent) {
     }
     for (next = start; !found;) {
         next++;
-        if (next >= end) {
+        if (next >= end)
             break;
-        }
         pos = state.bMarks[next] + state.tShift[next];
         max = state.eMarks[next];
         if (pos < max && state.tShift[next] < state.blkIndent) {
@@ -153,42 +143,43 @@ function blockMath(state, start, end, silent) {
         }
     }
     state.line = next + 1;
-    token = state.push('math_block', 'math', 0);
+    const token = state.push('math_block', 'math', 0);
+    if (token === undefined)
+        throw new Error('token is undefined');
     token.block = true;
-    token.content = (firstLine && firstLine.trim() ? firstLine + '\n' : '')
+    token.content = ((firstLine && firstLine.trim()) ? `${firstLine}\n` : '')
         + state.getLines(start + 1, next, state.tShift[start], true)
-        + (lastLine && lastLine.trim() ? lastLine : '');
+        + ((lastLine && lastLine.trim()) ? lastLine : '');
     token.map = [start, state.line];
     token.markup = '$$';
     return true;
 }
 function blockBareMath(state, start, end, silent) {
-    var lastLine, found = false, pos = state.bMarks[start] + state.tShift[start], max = state.eMarks[start];
+    let lastLine;
+    let found = false;
+    let pos = state.bMarks[start] + state.tShift[start];
+    let max = state.eMarks[start];
     const firstLine = state.src.slice(pos, max);
-    if (!/^\\begin/.test(firstLine)) {
+    if (!/^\\begin/.test(firstLine))
         return false;
-    }
     if (start > 0) {
         // Previous line must be blank for bare blocks
         const previousStart = state.bMarks[start - 1] + state.tShift[start - 1];
         const previousEnd = state.eMarks[start - 1];
         const previousLine = state.src.slice(previousStart, previousEnd);
-        if (!/^\s*$/.test(previousLine)) {
+        if (!/^\s*$/.test(previousLine))
             return false;
-        }
     }
-    if (silent) {
+    if (silent)
         return true;
-    }
     // Handle Single line code block
     let next = start;
     if (!/\\end[\{\}\w]*\s*$/.test(firstLine)) {
         let nestingCount = 0;
         for (; !found;) {
             next++;
-            if (next >= end) {
+            if (next >= end)
                 break;
-            }
             pos = state.bMarks[next] + state.tShift[next];
             max = state.eMarks[next];
             if (pos < max && state.tShift[next] < state.blkIndent) {
@@ -212,23 +203,21 @@ function blockBareMath(state, start, end, silent) {
     state.line = next + 1;
     const token = state.push('math_block', 'math', 0);
     token.block = true;
-    token.content = (firstLine && firstLine.trim() ? firstLine + '\n' : '')
+    token.content = ((firstLine && firstLine.trim()) ? `${firstLine}\n` : '')
         + state.getLines(start + 1, next, state.tShift[start], true)
-        + (lastLine && lastLine.trim() ? lastLine : '');
+        + ((lastLine && lastLine.trim()) ? lastLine : '');
     token.map = [start, state.line];
     token.markup = '$$';
     return true;
 }
 function inlineMathBlock(state, silent) {
-    var start, match, token, res, pos;
-    if (state.src.slice(state.pos, state.pos + 2) !== "$$") {
+    let match, token, res, pos;
+    if (state.src.slice(state.pos, state.pos + 2) !== '$$')
         return false;
-    }
     res = isValidBlockDelim(state, state.pos);
     if (!res.can_open) {
-        if (!silent) {
-            state.pending += "$$";
-        }
+        if (!silent)
+            state.pending += '$$';
         state.pos += 2;
         return true;
     }
@@ -236,50 +225,46 @@ function inlineMathBlock(state, silent) {
     // This loop will assume that the first leading backtick can not
     // be the first character in state.src, which is known since
     // we have found an opening delimieter already.
-    start = state.pos + 2;
+    const start = state.pos + 2;
     match = start;
-    while ((match = state.src.indexOf("$$", match)) !== -1) {
+    // eslint-disable-next-line no-cond-assign
+    while ((match = state.src.indexOf('$$', match)) !== -1) {
         // Found potential $$, look for escapes, pos will point to
         // first non escape when complete
         pos = match - 1;
-        while (state.src[pos] === "\\") {
+        while (state.src[pos] === '\\')
             pos -= 1;
-        }
         // Even number of escapes, potential closing delimiter found
-        if (((match - pos) % 2) == 1) {
+        if (((match - pos) % 2) === 1)
             break;
-        }
         match += 2;
     }
     // No closing delimter found.  Consume $$ and continue.
     if (match === -1) {
-        if (!silent) {
-            state.pending += "$$";
-        }
+        if (!silent)
+            state.pending += '$$';
         state.pos = start;
         return true;
     }
     // Check if we have empty content, ie: $$$$.  Do not parse.
     if (match - start === 0) {
-        if (!silent) {
-            state.pending += "$$$$";
-        }
+        if (!silent)
+            state.pending += '$$$$';
         state.pos = start + 2;
         return true;
     }
     // Check for valid closing delimiter
     res = isValidBlockDelim(state, match);
     if (!res.can_close) {
-        if (!silent) {
-            state.pending += "$$";
-        }
+        if (!silent)
+            state.pending += '$$';
         state.pos = start;
         return true;
     }
     if (!silent) {
         token = state.push('math_block', 'math', 0);
         token.block = true;
-        token.markup = "$$";
+        token.markup = '$$';
         token.content = state.src.slice(start, match);
     }
     state.pos = match + 2;
@@ -287,19 +272,17 @@ function inlineMathBlock(state, silent) {
 }
 function inlineBareBlock(state, silent) {
     const text = state.src.slice(state.pos);
-    if (!/^\n\\begin/.test(text)) {
+    if (!/^\n\\begin/.test(text))
         return false;
-    }
     state.pos += 1;
-    if (silent) {
+    if (silent)
         return true;
-    }
     const lines = text.split(/\n/g).slice(1);
     const beginRe = /^\\begin/;
     const endRe = /^\\end/;
     let nestingCount = 0;
-    let foundLine = undefined;
-    for (var i = 0; i < lines.length; ++i) {
+    let foundLine;
+    for (let i = 0; i < lines.length; ++i) {
         const line = lines[i];
         if (beginRe.test(line)) {
             ++nestingCount;
@@ -312,14 +295,13 @@ function inlineBareBlock(state, silent) {
             }
         }
     }
-    if (typeof foundLine === 'undefined') {
+    if (typeof foundLine === 'undefined')
         return false;
-    }
     const endIndex = lines.slice(0, foundLine + 1).reduce((p, c) => p + c.length, 0) + foundLine + 1;
     if (!silent) {
         const token = state.push('math_inline_bare_block', 'math', 0);
         token.block = true;
-        token.markup = "$$";
+        token.markup = '$$';
         token.content = text.slice(1, endIndex);
     }
     state.pos = state.pos + endIndex;
@@ -332,21 +314,18 @@ function handleMathInHtml(state, mathType, mathMarkup, mathRegex) {
     for (let index = tokens.length - 1; index >= 0; index--) {
         const currentToken = tokens[index];
         const newTokens = [];
-        if (currentToken.type !== "html_block") {
+        if (currentToken.type !== 'html_block')
             continue;
-        }
         const content = currentToken.content;
         // Process for each math referenced within the html block
         for (const match of content.matchAll(mathRegex)) {
-            if (!match.groups) {
+            if (!match.groups)
                 continue;
-            }
             const html_before_math = match.groups.html_before_math;
             const math = match.groups.math;
             const html_after_math = match.groups.html_after_math;
-            if (html_before_math) {
-                newTokens.push({ ...currentToken, type: "html_block", map: null, content: html_before_math });
-            }
+            if (html_before_math)
+                newTokens.push({ ...currentToken, type: 'html_block', map: null, content: html_before_math });
             if (math) {
                 newTokens.push({
                     ...currentToken,
@@ -355,27 +334,25 @@ function handleMathInHtml(state, mathType, mathMarkup, mathRegex) {
                     content: math,
                     markup: mathMarkup,
                     block: true,
-                    tag: "math",
+                    tag: 'math',
                 });
             }
-            if (html_after_math) {
-                newTokens.push({ ...currentToken, type: "html_block", map: null, content: html_after_math });
-            }
+            if (html_after_math)
+                newTokens.push({ ...currentToken, type: 'html_block', map: null, content: html_after_math });
         }
         // Replace the original html_block token with the newly expanded tokens
-        if (newTokens.length > 0) {
+        if (newTokens.length > 0)
             tokens.splice(index, 1, ...newTokens);
-        }
     }
     return true;
 }
 function escapeHtml(unsafe) {
     return unsafe
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
 }
 function default_1(md, options) {
     // Default options
@@ -389,10 +366,9 @@ function default_1(md, options) {
             return katex_1.default.renderToString(latex, { ...options, displayMode });
         }
         catch (error) {
-            if (options.throwOnError) {
-                console.log(error);
-            }
-            return `<span class="katex-error" title="${escapeHtml(latex)}">${escapeHtml(error + '')}</span>`;
+            if (options.throwOnError)
+                console.error(error);
+            return `<span class="katex-error" title="${escapeHtml(latex)}">${escapeHtml(`${error}`)}</span>`;
         }
     };
     const inlineRenderer = (tokens, idx) => {
@@ -403,40 +379,37 @@ function default_1(md, options) {
             return `<p class="katex-block">${katex_1.default.renderToString(latex, { ...options, displayMode: true })}</p>`;
         }
         catch (error) {
-            if (options.throwOnError) {
-                console.log(error);
-            }
-            return `<p class="katex-block katex-error" title="${escapeHtml(latex)}">${escapeHtml(error + '')}</p>`;
+            if (options.throwOnError)
+                console.error(error);
+            return `<p class="katex-block katex-error" title="${escapeHtml(latex)}">${escapeHtml(`${error}`)}</p>`;
         }
     };
     const blockRenderer = (tokens, idx) => {
-        return katexBlockRenderer(tokens[idx].content) + '\n';
+        return `${katexBlockRenderer(tokens[idx].content)}\n`;
     };
     md.inline.ruler.after('escape', 'math_inline', inlineMath);
     md.inline.ruler.after('escape', 'math_inline_block', inlineMathBlock);
-    if (enableBareBlocks) {
+    if (enableBareBlocks)
         md.inline.ruler.before('text', 'math_inline_bare_block', inlineBareBlock);
-    }
     md.block.ruler.after('blockquote', 'math_block', (state, start, end, silent) => {
-        if (enableBareBlocks && blockBareMath(state, start, end, silent)) {
+        if (enableBareBlocks && blockBareMath(state, start, end, silent))
             return true;
-        }
         return blockMath(state, start, end, silent);
     }, {
-        alt: ['paragraph', 'reference', 'blockquote', 'list']
+        alt: ['paragraph', 'reference', 'blockquote', 'list'],
     });
     // Regex to capture any html prior to math block, the math block (single or multi line), and any html after the math block
     const math_block_within_html_regex = /(?<html_before_math>[\s\S]*?)\$\$(?<math>[\s\S]+?)\$\$(?<html_after_math>(?:(?!\$\$[\s\S]+?\$\$)[\s\S])*)/gm;
     // Regex to capture any html prior to math inline, the math inline (single line), and any html after the math inline
     const math_inline_within_html_regex = /(?<html_before_math>[\s\S]*?)\$(?<math>.*?)\$(?<html_after_math>(?:(?!\$.*?\$)[\s\S])*)/gm;
     if (enableMathBlockInHtml) {
-        md.core.ruler.push("math_block_in_html_block", (state) => {
-            return handleMathInHtml(state, "math_block", "$$", math_block_within_html_regex);
+        md.core.ruler.push('math_block_in_html_block', (state) => {
+            return handleMathInHtml(state, 'math_block', '$$', math_block_within_html_regex);
         });
     }
     if (enableMathInlineInHtml) {
-        md.core.ruler.push("math_inline_in_html_block", (state) => {
-            return handleMathInHtml(state, "math_inline", "$", math_inline_within_html_regex);
+        md.core.ruler.push('math_inline_in_html_block', (state) => {
+            return handleMathInHtml(state, 'math_inline', '$', math_inline_within_html_regex);
         });
     }
     md.renderer.rules.math_inline = inlineRenderer;
@@ -445,4 +418,3 @@ function default_1(md, options) {
     md.renderer.rules.math_block = blockRenderer;
 }
 exports.default = default_1;
-;
