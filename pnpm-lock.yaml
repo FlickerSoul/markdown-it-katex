@@ -3,6 +3,7 @@ lockfileVersion: 5.4
 specifiers:
   '@types/katex': ^0.16.0
   '@types/markdown-it': ^12.2.3
+  '@types/node': ^18.11.19
   katex: ^0.16.4
   markdown-it: 13.0.0
   markdown-it-testgen: ^0.1.6
@@ -15,6 +16,7 @@ dependencies:
 devDependencies:
   '@types/katex': 0.16.0
   '@types/markdown-it': 12.2.3
+  '@types/node': 18.11.19
   markdown-it: 13.0.0
   markdown-it-testgen: 0.1.6
   tape: 5.6.3
@@ -39,6 +41,10 @@ packages:
 
   /@types/mdurl/1.0.2:
     resolution: {integrity: sha512-eC4U9MlIcu2q0KQmXszyn5Akca/0jrQmwDRgpAMJai7qBWq4amIQhZyNau4VYGtCeALvW1/NtjzJJ567aZxfKA==}
+    dev: true
+
+  /@types/node/18.11.19:
+    resolution: {integrity: sha512-YUgMWAQBWLObABqrvx8qKO1enAvBUdjZOAWQ5grBAkp5LQv45jBvYKZ3oFS9iKRCQyFjqw6iuEa1vmFqtxYLZw==}
     dev: true
 
   /argparse/1.0.10:
