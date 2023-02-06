@@ -11,10 +11,10 @@ specifiers:
   typescript: ^4.9.5
 
 dependencies:
+  '@types/katex': 0.16.0
   katex: 0.16.4
 
 devDependencies:
-  '@types/katex': 0.16.0
   '@types/markdown-it': 12.2.3
   '@types/node': 18.11.19
   markdown-it: 13.0.0
@@ -26,7 +26,7 @@ packages:
 
   /@types/katex/0.16.0:
     resolution: {integrity: sha512-hz+S3nV6Mym5xPbT9fnO8dDhBFQguMYpY0Ipxv06JMi1ORgnEM4M1ymWDUhUNer3ElLmT583opRo4RzxKmh9jw==}
-    dev: true
+    dev: false
 
   /@types/linkify-it/3.0.2:
     resolution: {integrity: sha512-HZQYqbiFVWufzCwexrvh694SOim8z2d+xJl5UNamcvQFejLY/2YUtzXHYi3cHdI7PMlS8ejH2slRAOJQ32aNbA==}
