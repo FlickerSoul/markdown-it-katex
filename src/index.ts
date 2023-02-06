@@ -447,7 +447,7 @@ function escapeHtml(unsafe: string): string {
       .replace(/'/g, '&#039;')
 }
 
-export default function (md: import('markdown-it'), options: any) {
+module.exports = function (md: import('markdown-it'), options: any) {
     // Default options
 
     options = options || {}

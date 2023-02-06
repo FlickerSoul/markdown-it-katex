@@ -357,7 +357,7 @@ function escapeHtml(unsafe) {
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
 }
-function default_1(md, options) {
+module.exports = function (md, options) {
     // Default options
     options = options || {};
     const enableBareBlocks = options.enableBareBlocks;
@@ -419,5 +419,4 @@ function default_1(md, options) {
     md.renderer.rules.math_inline_block = blockRenderer;
     md.renderer.rules.math_inline_bare_block = blockRenderer;
     md.renderer.rules.math_block = blockRenderer;
-}
-exports.default = default_1;
+};
