@@ -1,4 +1,4 @@
-import katex from 'katex'
+import katex, {KatexOptions} from 'katex'
 import type StateBlock from 'markdown-it/lib/rules_block/state_block'
 import type StateCore from 'markdown-it/lib/rules_core/state_core'
 import type StateInline from 'markdown-it/lib/rules_inline/state_inline'
@@ -448,7 +448,14 @@ function escapeHtml(unsafe: string): string {
       .replace(/'/g, '&#039;')
 }
 
-export = function (md: MarkdownIt, options: any) {
+type MdKatexOptions = KatexOptions & {
+    enableBareBlocks?: boolean
+    enableMathBlockInHtml?: boolean
+    enableMathInlineInHtml?: boolean
+}
+
+
+export = function (md: MarkdownIt, options: MdKatexOptions ) {
     // Default options
 
     options = options || {}

@@ -1,11 +1,11 @@
 {
     "name": "@uniob/markdown-it-katex",
-    "version": "1.1.0r4",
+    "version": "1.1.1",
     "description": "Markdown-it plugin that provides VS Code's KaTeX support",
     "main": "build/index.js",
     "types": "build/index.d.ts",
     "scripts": {
-        "compile": "tsc",
+        "build": "tsc",
         "test": "node test/all.js",
         "test-render": "node test/test-render.js test/test.md > test/out.html"
     },
