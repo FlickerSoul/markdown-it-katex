@@ -168,3 +168,6 @@ typings/
 
 # jetbrains
 .idea
+
+# dist output 
+dist/
